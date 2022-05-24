@@ -16,13 +16,29 @@ public:
 
 class locality {
 	string name;
-	int population;
+	size_t population;
 
 public:
 	locality() {
 		name = "unknown";
 		population = 0;
 	}
+	locality(const string& _name, const size_t _population) : name(_name), population(_population) {}
+
+	locality(const locality& rhs){
+		name = rhs.name;
+		population = rhs.population;
+	}
+
+	string GetName() const { return name; }
+	int GetPeopleCount() const { return population; }
+
+	locality& operator=(const locality& rhs){
+		if (this == &rhs) return *this;
+		name = rhs.name;
+		population = rhs.population;
+		return *this;
+	}	
 };
 
 struct TVertex {
@@ -43,4 +59,7 @@ struct TEdge {
 	bool payment;
 };
 
+int main() {
+
+}
 

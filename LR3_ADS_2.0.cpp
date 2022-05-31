@@ -292,15 +292,64 @@ public:
         }
     }
     void Dijkstra(int k) {
-        vector<bool> visited;
-        priority_queue <pair<int, double>>distance;
+        vector<bool> visited; // посещенные 
+        vector <pair<int, double>>distance;  // номер вершины и лучшее расстояние
+        list <pair<int,double>> queue; // 
 
-        const int infinity = std::numeric_limits<int>::max();
-        visited.resize(count, infinity);
+        //const double infinity = std::numeric_limits<double>::max();
+        visited.resize(count,0);
+
+        for (int i = 0; i < count; i++) {
+            distance.push_back(make_pair(i, INFINITY));
+        }
+        distance[k].first = k; // номер вершины
+        distance[k].second = 0; // маршрут до нее
+
+        queue.push_back(make_pair(distance[k].first, distance[k].second));
+
+        while (!queue.empty())
+        {
+            pair<int, double> active = queue.front();
+            queue.pop_front();
+
+            if (active.second > distance[active.first].second);
+            /*0. Добавляем первый элемент в очередь
+            1 Берем след элемент по очереди
+            2. Ставим на него active
+            3. Удаляем из очереди*/
+            4. Записываем до него путь: 
+            
+            !а вот тут надо знать ребро, которое на него указывает, чтобы посчитать его вес и путь!!!
+
+                для первого ребра все проставляется до while, там дистанцию мы задали, 
+                для не первого дистанцию запишем во время указания соседей
+                if (active.second() < distance[active.first].second) {
+                distance[active.first].second = active.second;
+            } 
+            ? ? ? ? ? ? ? ?
+            5. Записываем в очередь его соседей
+                // пройти по списку вершин, найти по номеру нужную и взаять ее соседей и пути до них записать их в queue
+                for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
+                queue.push_back(make_pair(get_vertex_by_name(it->get_destination).get_number(),it-> get_length))
+                }
+            6. Окрашиваем его
+
+            //continue;
+            for (int i = 0; i < (int)g[active.first].size(); i++) {
+                int v = g[active.first][i].first, len = g[active.first][i].first;
+                if (dist[v] > dist[active.first] + len) {
+                    p[v] = active.first;
+                    dist[v] = dist[active.first] + len;
+                    q.push(make_pair(dist[v], v));
+                }
+            }
+
+        }
+        //for (int i = 0; i < count; i++) { cout<< distance[i].first<< ' '<<distance[i].second; cout<<endl;}
+
         //fill(dist, dist + n, INF); //
         //dist[u] = 0;
         //p[u] = u;
-
         //priority_queue <pair<int, double>,  vector< pair<int, int> > , greater <pair<int, int>> > queue; 
               //номер вершины, расстояние до нее; контейнер, в котором будут храниться данные;   компаратор(находится в заголовочном файле functional). 
 
@@ -312,9 +361,14 @@ public:
 
             /*q.push(make_pair(0, u));
             while (!q.empty()) {
+
+
                 pair<int, int> u = q.top();
-                q.pop();
-                if (u.first > dist[u.second]) continue;
+                q.pop();*/
+
+                if (u.first > dist[u.second]); 
+                // если расстояние до текущего больше, 
+                //чем уже записанного ( записанный достаем по номеру 
                 for (int i = 0; i < (int)g[u.second].size(); i++) {
                     int v = g[u.second][i].second, len = g[u.second][i].first;
                     if (dist[v] > dist[u.second] + len) {
@@ -323,9 +377,9 @@ public:
                         q.push(make_pair(dist[v], v));
                     }
                 }
-            }
-        }*/
-    }
+            /*}*/
+        /*}
+    }*/
 
 };
 
@@ -361,6 +415,7 @@ public:
         G1.print();
 
         int f = 1;
+        G1.Dijkstra(f);
         G1.BFS(f);
 
 

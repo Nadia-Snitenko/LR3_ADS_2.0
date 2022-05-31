@@ -312,7 +312,16 @@ public:
             pair<int, double> active = queue.front();
             queue.pop_front();
 
-            if (active.second > distance[active.first].second);
+            if (active.second < distance[active.first].second) { //если найденное расстояние меньше записанного
+                distance[active.first].second = active.second;
+            }
+
+            for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
+                // пройти по списку вершин, найти по номеру нужную и взять ее соседей и пути до них записать их в queue
+                queue.push_back(make_pair(get_vertex_by_name(it->get_destination()).get_number(), it->get_length()));
+            }
+
+
             /*0. Добавляем первый элемент в очередь
             1 Берем след элемент по очереди
             2. Ставим на него active
@@ -330,6 +339,7 @@ public:
             5. Записываем в очередь его соседей
                 // пройти по списку вершин, найти по номеру нужную и взаять ее соседей и пути до них записать их в queue
                 for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
+                    //
                 queue.push_back(make_pair(get_vertex_by_name(it->get_destination).get_number(),it-> get_length))
                 }
             6. Окрашиваем его

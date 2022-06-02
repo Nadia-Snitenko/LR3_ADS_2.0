@@ -293,188 +293,72 @@ public:
     }
 
 
- /*   struct distance {
-        int number;
-        double min_val;
-        vector<int> way;
+    vector <int> Dijkstra(int start, int finish) {
 
-        distance():number(0),min_val(INFINITY) {};
-        ~distance() {}
+        vector<bool> visited; // посещенные вершины отмечаются 
+        vector <pair <int, pair<double, vector<int>>>>_distance; 
+             //pair: {int-номер вершины, 
+                        //pair:(double- длина лучшего найденного пути;
+                                       //vector<int>-вектор номеров вершин, через которой прошел путь до текущей )}
 
-        void set_number; ()
-    };*/
-
-    void Dijkstra(int k) {
-
-        vector<bool> visited; // посещенные 
-        //vector <pair<int, double>>distance;  // номер вершины и лучшее расстояние
-        vector <pair <int, pair<double, vector<int>>>>_distance; //  +++
-
-
-        //list <pair<int,double>> queue;  
-        //priority_queue <pair<int, double>, vector<pair<int, double>>, greater <pair<int, double>> > _queue; // ++
-        priority_queue < pair <int, pair<double, vector<int> > >, vector< pair  <int, pair< double, vector<int> > > >, greater <pair<int, pair<double, vector<int> > > > >  __queue; //+++
-
-        visited.resize(count, 0);
-
-        //for (int i = 0; i < count; i++) {
-        //    distance.push_back(make_pair(i, INFINITY));
-        //}
-        //distance[k].first = k; // номер вершины
-        //distance[k].second = 0; // маршрут до нее
-
-
+        priority_queue < pair <int, pair <double, vector<int> > >, 
+                vector < pair <int, pair <double, vector<int> > > >, 
+               greater < pair <int, pair <double, vector<int> > > > >  __queue; 
+               // очередь с приоритетом: номер вершины, длина пути, путь
+               //нам нужен компаратор greater, чтобы приоритет был у минимальных значений
+         
+        visited.resize(count, 0); //задаем размер и "непосещенность" по умолчанию
 
         for (int i = 0; i < count; i++) {
             vector<int>temp;
-            temp.push_back(k);
-            _distance.push_back(make_pair(i, make_pair(INFINITY,temp)));
+            temp.push_back(start);
+            _distance.push_back(make_pair(i, make_pair(INFINITY,temp))); // всем вершинам пр умолчанию устанавливаем:
+            //i-порядковый номер, INFINITY- бесконечная отдаленность, вектор temp - путь, который начинается в start
         }
-        _distance[k].first = k; // номер вершины //+++
-        _distance[k].second.first = 0; // маршрут до нее // +++
 
-        //queue.push_back(make_pair(distance[k].first, distance[k].second));
-        //_queue.push(make_pair(distance[k].first, distance[k].second));
-        //_queue.push(make_pair(_distance[k].first, _distance[k].second.first)); 
-        __queue.push(make_pair(_distance[k].first, make_pair(_distance[k].second.first, _distance[k].second.second))); // +++
+        _distance[start].first = start;    // номер вершины 
+        _distance[start].second.first = 0; // длина дороги до нее
 
-        /*
-        while (!queue.empty()) {
-            pair<int, double> active = queue.front();
-            queue.pop_front();
+        __queue.push(make_pair(_distance[start].first, make_pair(_distance[start].second.first, _distance[start].second.second))); 
+        //добавили в очередь элемент, с которого все и нчнется
 
-
-            if (active.second < distance[active.first].second) { //если найденное расстояние меньше записанного
-                distance[active.first].second = active.second;
-            }
-
-            for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
-                // пройти по списку вершин соседей, найти по имени ее номер и взять путь=длина ребра+дистанция до текущей, записать в queue
-                queue.push_back(make_pair(get_vertex_by_name(it->get_destination()).get_number(), distance[active.first].second + it->get_length()));
-            }
-
-            visited[active.first] = true;
-        }*/
-
-        //while (!_queue.empty()) {
-        //    pair<int, double> active = _queue.top();
-        //    _queue.pop();
-
-
-        //    if (active.second < distance[active.first].second) { //если найденное расстояние меньше записанного
-        //        distance[active.first].second = active.second;
-        //    }
-
-        //    if (active.second < _distance[active.first].second.first) { //если найденное расстояние меньше записанного  +++
-        //        _distance[active.first].second.first = active.second;
-        //        _distance[active.first].second.second=
-        //    }
-
-        //    for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
-        //        // пройти по списку вершин соседей, найти по имени ее номер и взять путь=длина ребра+дистанция до текущей, записать в queue
-        //        _queue.push(make_pair(get_vertex_by_name(it->get_destination()).get_number(), distance[active.first].second + it->get_length()));
-        //    }
-
-        //    visited[active.first] = true;
-        //}
-        //cout << endl<<"best length: "<<distance[5].second << endl;
 
         while (!__queue.empty()) {
-            pair<int, pair<double, vector<int> >> active = __queue.top();
-            __queue.pop();
+            pair<int, pair<double, vector<int> >> active = __queue.top(); //взяли с врешины очереди вершину и сделали ее активной
+            __queue.pop(); //удалили вершину из очереди, тк мы ее уже рассматриваем
 
 
-            if (active.second.first < _distance[active.first].second.first) { //если найденное расстояние меньше записанного  +++
-                _distance[active.first].second.first = active.second.first; // запишем новое наименьшее значение
-                _distance[active.first].second.second= active.second.second; // запишем вектор вершин, который ведет в данную вершину
-                _distance[active.first].second.second.push_back(active.first); // запишем саму вершину в конец для полного путь
+            if (active.second.first < _distance[active.first].second.first) { //если найденное расстояние меньше записанного  
+                _distance[active.first].second.first = active.second.first;   // запишем новое наименьшее значение
+                _distance[active.first].second.second= active.second.second;  // запишем вектор вершин, который ведет в данную вершину
+                _distance[active.first].second.second.push_back(active.first);// запишем саму вершину в конец для полного путь
             }
 
             for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
-                // пройти по списку вершин соседей, найти по имени ее номер и взять путь=длина ребра+дистанция до текущей, записать в queue
+                // проходим по списку вершин соседей, 
+                // находим по имени ее номер 
+                // и берем путь=длина ребра + путь до текущей, 
+                // записываем найденных соседей в queue
                 __queue.push(  make_pair( get_vertex_by_name(it->get_destination()).get_number(),
                                           make_pair(_distance[active.first].second.first + it->get_length(),_distance[active.first].second.second)
                                         )
                             );
             }
 
-            visited[active.first] = true;
+            visited[active.first] = true; // отмечаем вершину обработанной 
         }
-        cout << endl<<"best length: "<<_distance[5].second.first << endl;
+        
+        cout << endl << "best length of way: " << _distance[finish].second.first << endl;
+        return _distance[finish].second.second;
+    }
+
+    void print_way(vector<int> way_from_start_to_finish) {
+
         cout << endl << "way: ";
-        for (int i = 0; i < _distance[5].second.second.size(); i++) { cout  << _distance[5].second.second[i] << " "; }
+        for (int i = 0; i < way_from_start_to_finish.size(); i++) { cout << way_from_start_to_finish[i] << " "; }
         cout << endl;
     }
-            /*0. Добавляем первый элемент в очередь
-            1 Берем след элемент по очереди
-            2. Ставим на него active
-            3. Удаляем из очереди
-            4. Записываем до него путь: 
-            
-            !а вот тут надо знать ребро, которое на него указывает, чтобы посчитать его вес и путь!!!
-
-                для первого ребра все проставляется до while, там дистанцию мы задали, 
-                для не первого дистанцию запишем во время указания соседей
-                if (active.second() < distance[active.first].second) {
-                distance[active.first].second = active.second;
-            } 
-  
-            5. Записываем в очередь его соседей
-                // пройти по списку вершин, найти по номеру нужную и взаять ее соседей и пути до них записать их в queue
-                for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
-                    //
-                queue.push_back(make_pair(get_vertex_by_name(it->get_destination).get_number(),it-> get_length))
-                }
-            6. Окрашиваем его*/
-
-        
-        //priority_queue <pair<int, double>,  vector< pair<int, int> > , greater <pair<int, int>> > queue; 
-              //номер вершины, расстояние до нее; контейнер, в котором будут храниться данные;   компаратор(находится в заголовочном файле functional). 
-
-        /*Почему нам нужен какой-то другой компаратор?
-            Потому что при стандартном объявлении priority_queue< pair<int, int> >,
-            доставать получится только те вершины,
-            расстояние до которых максимально,
-            а нам-то нужно совсем наоборот.
-
-    int main()
-    {
-        int myints[] = { 10,60,50,20,10,50,30 };
-
-        std::priority_queue<int> first;
-        std::priority_queue<int, std::vector<int> > second(myints, myints + 7);
-        std::priority_queue<int, std::vector<int>, std::greater<int> >
-            third(myints, myints + 7);
-
-        int count = 7;
-        //vector <pair<int, double>>distance;  // номер вершины и лучшее расстояние
-        //list <pair<int, double>> queue; // 
-        priority_queue <pair<int, double>, vector<pair<int, double>>, greater <pair<int, double>> > _queue;
-
-        //const double infinity = std::numeric_limits<double>::max();
-
-        for (int i = 0; i < count; i++) {
-            _queue.push(make_pair(i, myints[i]));
-        }
-
-        _queue.push(make_pair(1, 45));
-        _queue.push(make_pair(5, 5));
-        _queue.push(make_pair(6, 10));
-        _queue.push(make_pair(2, 20));
-
-        while (!third.empty()) {
-            cout << third.top() << " ";
-            third.pop();
-        }
-        cout << endl;
-        while (!_queue.empty()) {
-            cout << _queue.top().first << " - " << _queue.top().second << endl;
-            _queue.pop();
-        }
-
-        return 0;
-    }*/
-
+    
 };
 
 
@@ -520,21 +404,20 @@ public:
 
         G1.add_edge_between_vertices(v4.get_name(), v1.get_name(), l = 1, t = 1, p = 0);
         G1.add_edge_between_vertices(v4.get_name(), v3.get_name(), l = 1, t = 1, p = 0);
-
-        
+  
         G1.print();
 
-        int begin = 0;
-        G1.Dijkstra(begin);
-
-        G1.BFS(begin);
-
-
-
-        size_t option = 0;
-
-        string _name, _name2;
+        int start = 0;
+        int finish = 5;
+        G1.print_way(G1.Dijkstra(start,finish));
         
+        G1.BFS(start);
+
+
+
+        int option = 0;
+        string _name, _name2;
+       
         bool check;
 
         //do {
@@ -569,9 +452,7 @@ public:
         //        G1.add_vertex(v1);
         //
         //        break;
-        //
-        //    case 2:
-        //       
+  
         //    case 3:
         //        cout << "Delete Vertex Operation -" << endl;
         //        cout << "Enter ID of Vertex(State) to Delete : ";
@@ -591,9 +472,7 @@ public:
         //        G1.add_edge_between_vertices(_name, _name2, w,t,p);
         //
         //        break;
-        //
-        //    case 5:
-        //
+       
         //    case 6:
         //        cout << "Delete Edge Operation -" << endl;
         //        cout << "Enter ID of Source Vertex(State): ";

@@ -292,12 +292,15 @@ public:
         }
     }
     void Dijkstra(int k) {
+
         vector<bool> visited; // посещенные 
         vector <pair<int, double>>distance;  // номер вершины и лучшее расстояние
+
         list <pair<int,double>> queue; // 
+        priority_queue <pair<int, double>, vector<pair<int, double>>, greater <pair<int, double>> > _queue;
 
         //const double infinity = std::numeric_limits<double>::max();
-        visited.resize(count,0);
+        visited.resize(count, 0);
 
         for (int i = 0; i < count; i++) {
             distance.push_back(make_pair(i, INFINITY));
@@ -306,26 +309,48 @@ public:
         distance[k].second = 0; // маршрут до нее
 
         queue.push_back(make_pair(distance[k].first, distance[k].second));
+        _queue.push(make_pair(distance[k].first, distance[k].second));
 
-        while (!queue.empty())
-        {
+        /*
+        while (!queue.empty()) {
             pair<int, double> active = queue.front();
             queue.pop_front();
+
 
             if (active.second < distance[active.first].second) { //если найденное расстояние меньше записанного
                 distance[active.first].second = active.second;
             }
 
             for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
-                // пройти по списку вершин, найти по номеру нужную и взять ее соседей и пути до них записать их в queue
-                queue.push_back(make_pair(get_vertex_by_name(it->get_destination()).get_number(), it->get_length()));
+                // пройти по списку вершин соседей, найти по имени ее номер и взять путь=длина ребра+дистанция до текущей, записать в queue
+                queue.push_back(make_pair(get_vertex_by_name(it->get_destination()).get_number(), distance[active.first].second + it->get_length()));
             }
 
+            visited[active.first] = true;
+        }*/
 
+        while (!_queue.empty()) {
+            pair<int, double> active = _queue.top();
+            _queue.pop();
+
+
+            if (active.second < distance[active.first].second) { //если найденное расстояние меньше записанного
+                distance[active.first].second = active.second;
+            }
+
+            for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
+                // пройти по списку вершин соседей, найти по имени ее номер и взять путь=длина ребра+дистанция до текущей, записать в queue
+                _queue.push(make_pair(get_vertex_by_name(it->get_destination()).get_number(), distance[active.first].second + it->get_length()));
+            }
+
+            visited[active.first] = true;
+        }
+        cout << endl<<"best length: "<<distance[5].second << endl;
+    }
             /*0. Добавляем первый элемент в очередь
             1 Берем след элемент по очереди
             2. Ставим на него active
-            3. Удаляем из очереди*/
+            3. Удаляем из очереди
             4. Записываем до него путь: 
             
             !а вот тут надо знать ребро, которое на него указывает, чтобы посчитать его вес и путь!!!
@@ -335,31 +360,16 @@ public:
                 if (active.second() < distance[active.first].second) {
                 distance[active.first].second = active.second;
             } 
-            ? ? ? ? ? ? ? ?
+  
             5. Записываем в очередь его соседей
                 // пройти по списку вершин, найти по номеру нужную и взаять ее соседей и пути до них записать их в queue
                 for (auto it = vertices[active.first].edgelist.begin(); it != vertices[active.first].edgelist.end(); it++) {
                     //
                 queue.push_back(make_pair(get_vertex_by_name(it->get_destination).get_number(),it-> get_length))
                 }
-            6. Окрашиваем его
+            6. Окрашиваем его*/
 
-            //continue;
-            for (int i = 0; i < (int)g[active.first].size(); i++) {
-                int v = g[active.first][i].first, len = g[active.first][i].first;
-                if (dist[v] > dist[active.first] + len) {
-                    p[v] = active.first;
-                    dist[v] = dist[active.first] + len;
-                    q.push(make_pair(dist[v], v));
-                }
-            }
-
-        }
-        //for (int i = 0; i < count; i++) { cout<< distance[i].first<< ' '<<distance[i].second; cout<<endl;}
-
-        //fill(dist, dist + n, INF); //
-        //dist[u] = 0;
-        //p[u] = u;
+        
         //priority_queue <pair<int, double>,  vector< pair<int, int> > , greater <pair<int, int>> > queue; 
               //номер вершины, расстояние до нее; контейнер, в котором будут храниться данные;   компаратор(находится в заголовочном файле functional). 
 
@@ -367,28 +377,44 @@ public:
             Потому что при стандартном объявлении priority_queue< pair<int, int> >,
             доставать получится только те вершины,
             расстояние до которых максимально,
-            а нам-то нужно совсем наоборот.*/
+            а нам-то нужно совсем наоборот.
 
-            /*q.push(make_pair(0, u));
-            while (!q.empty()) {
+    int main()
+    {
+        int myints[] = { 10,60,50,20,10,50,30 };
 
+        std::priority_queue<int> first;
+        std::priority_queue<int, std::vector<int> > second(myints, myints + 7);
+        std::priority_queue<int, std::vector<int>, std::greater<int> >
+            third(myints, myints + 7);
 
-                pair<int, int> u = q.top();
-                q.pop();*/
+        int count = 7;
+        //vector <pair<int, double>>distance;  // номер вершины и лучшее расстояние
+        //list <pair<int, double>> queue; // 
+        priority_queue <pair<int, double>, vector<pair<int, double>>, greater <pair<int, double>> > _queue;
 
-                if (u.first > dist[u.second]); 
-                // если расстояние до текущего больше, 
-                //чем уже записанного ( записанный достаем по номеру 
-                for (int i = 0; i < (int)g[u.second].size(); i++) {
-                    int v = g[u.second][i].second, len = g[u.second][i].first;
-                    if (dist[v] > dist[u.second] + len) {
-                        p[v] = u.second;
-                        dist[v] = dist[u.second] + len;
-                        q.push(make_pair(dist[v], v));
-                    }
-                }
-            /*}*/
-        /*}
+        //const double infinity = std::numeric_limits<double>::max();
+
+        for (int i = 0; i < count; i++) {
+            _queue.push(make_pair(i, myints[i]));
+        }
+
+        _queue.push(make_pair(1, 45));
+        _queue.push(make_pair(5, 5));
+        _queue.push(make_pair(6, 10));
+        _queue.push(make_pair(2, 20));
+
+        while (!third.empty()) {
+            cout << third.top() << " ";
+            third.pop();
+        }
+        cout << endl;
+        while (!_queue.empty()) {
+            cout << _queue.top().first << " - " << _queue.top().second << endl;
+            _queue.pop();
+        }
+
+        return 0;
     }*/
 
 };
@@ -397,36 +423,53 @@ public:
 
     int main() {
         Graph G1;
-        Vertex v1, v2, v3, v4;
+        Vertex v0, v1, v2, v3, v4, v5;
         int _population;
         double l;
         bool t = 1, p = 0;
+
+        v0.set("beg", 0);
+        G1.add_vertex(v0);
 
         v1.set("A", 1);
         G1.add_vertex(v1);
 
         v2.set("B", 2);
         G1.add_vertex(v2);
-        G1.add_edge_between_vertices(v1.get_name(), v2.get_name(), l = 45, t = 1, p = 0);
 
         v3.set("C", 3);
         G1.add_vertex(v3);
 
-        G1.add_edge_between_vertices(v2.get_name(), v3.get_name(), l = 45, t = 1, p = 0);
         v4.set("D", 4);
         G1.add_vertex(v4);
 
-    
-       
-        G1.add_edge_between_vertices(v2.get_name(), v4.get_name(), l = 45, t = 1, p = 0);
-        G1.add_edge_between_vertices(v4.get_name(), v1.get_name(), l = 45, t = 1, p = 0);
+        v5.set("fin", 5);
+        G1.add_vertex(v5);
+
+
+        G1.add_edge_between_vertices(v0.get_name(), v1.get_name(), l = 9, t = 1, p = 0);
+        G1.add_edge_between_vertices(v0.get_name(), v2.get_name(), l = 4, t = 1, p = 0);
+        G1.add_edge_between_vertices(v0.get_name(), v4.get_name(), l = 5, t = 1, p = 0);
+        G1.add_edge_between_vertices(v0.get_name(), v5.get_name(), l = 8, t = 1, p = 0);
+
+        G1.add_edge_between_vertices(v1.get_name(), v5.get_name(), l = 1, t = 1, p = 0);
+        G1.add_edge_between_vertices(v1.get_name(), v2.get_name(), l = 2, t = 1, p = 0);
+
+        G1.add_edge_between_vertices(v2.get_name(), v5.get_name(), l = 8, t = 1, p = 0);
+        G1.add_edge_between_vertices(v2.get_name(), v3.get_name(), l = 1, t = 1, p = 0);
+
+        G1.add_edge_between_vertices(v3.get_name(), v5.get_name(), l = 4, t = 1, p = 0);
+
+        G1.add_edge_between_vertices(v4.get_name(), v1.get_name(), l = 1, t = 1, p = 0);
+        G1.add_edge_between_vertices(v4.get_name(), v3.get_name(), l = 1, t = 1, p = 0);
 
         
         G1.print();
 
-        int f = 1;
-        G1.Dijkstra(f);
-        G1.BFS(f);
+        int begin = 0;
+        G1.Dijkstra(begin);
+
+        G1.BFS(begin);
 
 
 

@@ -1,14 +1,71 @@
 ﻿#include <iostream>
+#include <fstream>
 #include <vector>
 #include <list>
 #include <iterator>
-
-#include <limits>
 #include <queue>
 
-//#include <algorithm>
 
 using namespace std;
+
+class Town {
+    string name;
+    size_t population;
+public:
+    Town() : name(""), population(0) { }
+    Town(const string& _name, const int _population) : name(_name), population(_population) {}
+    Town(const Town& temp) {
+        name = temp.name;
+        population = temp.population;
+    }
+    ~Town() {}
+
+    Town& operator=(const Town& temp) {
+        if (this == &temp) return *this;
+        name = temp.name;
+        population = temp.population;
+        return *this;
+    }
+
+    string get_name() const { return name; }
+    void set_name(const string temp) { name = temp; }
+
+    size_t get_population() const { return population; }
+    void set_population(const size_t temp) { population = temp; }
+};
+
+istream& operator>> (istream& in, Town& temp) {
+    string temp_name;
+   size_t tepm_population;
+    cout << "\n Write new name for town: ";
+    in >> temp_name;
+    cout << "Write new number of population: ";
+    in >> tepm_population;
+    temp.set_name(temp_name);
+    temp.set_population(tepm_population);
+    return in;
+}
+
+ostream& operator<<(ostream& out, const Town& temp){
+    out <<" Town name: "<< temp.get_name() << "\n";
+    out <<" Number of population "<< temp.get_population() << " ";
+    return out;
+}
+
+template<> // заголовок с пустым списком шаблонных параметров то есть это - полная специализация шаблона 
+struct hash<Town> { // шаблонный класс, который мы специализируем  Вычисляет хэш-код для значения.
+    size_t operator()( Town& temp) { // перегружаем оператор круглые скобки
+        return hash<string>()(temp.get_name());
+    }
+};
+
+template<>
+struct equal_to<Town> {
+    size_t operator()( Town& lhs, Town& temp) const{
+        return ((lhs.get_name() == temp.get_name()) && (temp.get_population() == temp.get_population()));
+    }
+};
+
 
 struct Edge {           // ребро - путь/дорога
 	string destination; // пункт назначения
@@ -89,26 +146,49 @@ struct Vertex { // вершина - населенный пункт
 		cout<<"Edge between "<<name<<" and "<< _destination <<" added successfully"<<endl;
     }
 
-	Vertex& operator=(const Vertex& temp){
-		if (this == &temp) return *this;
-		name = temp.name;
+    Vertex& operator=(const Vertex& temp) {
+        if (this == &temp) return *this;
+        name = temp.name;
         number = temp.number;
-		population = temp.population;
+        population = temp.population;
 
-		return *this;
-	}
-
-
+        return *this;
+    }
+};
+template<>
+struct equal_to<Vertex> {
+    size_t operator()(const Vertex& v1, const Vertex& v2) {
+        return((v1.name == v2.name) && (v1.population == v2.population));
+    }
+};
+ 
+template<typename TEdge>
+class weight_converter {
+public:
+    double operator()(const TEdge& temp) const { // оператор приведения типоа
+        return static_cast<double>(temp);
+    }
 };
 
+template<> // специализация
+class  weight_converter<Edge> {
+public:
+    double operator()(const Edge& rhs) const {
+        return rhs.length;
+    }
+};
+
+
+template <typename TVertex, typename TEdge, typename equal = equal_to<Vertex>>
+
 class Graph {
-    vector<Vertex> vertices;
+    vector<TVertex> vertices;
     int count;
 public:
     Graph() : count(0) {}
     ~Graph() {}
 
-    bool check_if_vertex_exist_by_name(string temp) {
+    bool check_if_vertex_exist_by_name(const string & temp) const{
         for (int i = 0; i < vertices.size(); i++) {
             if (vertices.at(i).get_name() == temp) {
                 return 1;
@@ -117,9 +197,9 @@ public:
         return 0;
     }
 
-    bool check_if_edge_exist_between_vertices(string fromVertex, string toVertex) {
+    bool check_if_edge_exist_between_vertices(const string fromVertex, const string toVertex) {
         Vertex v = get_vertex_by_name(fromVertex);
-        list < Edge > e;
+        list < TEdge > e;
         e = v.get_edge_list();
         for (auto it = e.begin(); it != e.end(); it++) {
             if (it->get_destination() == toVertex) {
@@ -130,8 +210,8 @@ public:
         return 0;
     }
 
-    Vertex get_vertex_by_name(string _temp) {
-        Vertex temp;
+    TVertex get_vertex_by_name(string _temp) {
+        TVertex temp;
         for (int i = 0; i < vertices.size(); i++) {
             temp = vertices.at(i);
             if (temp.get_name() == _temp) {
@@ -141,7 +221,7 @@ public:
         return temp;
     }
 
-    void add_vertex(Vertex temp) {
+    void add_vertex( TVertex temp) {
         bool check = check_if_vertex_exist_by_name(temp.get_name());
         if (check) {
             cout << "Vertex with this name already exist" << endl;
@@ -157,7 +237,6 @@ public:
     void add_edge_between_vertices(string fromVertex, string toVertex, size_t _length, bool t, bool p) {
         bool check1 = check_if_vertex_exist_by_name(fromVertex);
         bool check2 = check_if_vertex_exist_by_name(toVertex);
-
         bool check3 = check_if_edge_exist_between_vertices(fromVertex, toVertex);
         if (check1 && check2) {
             if (check3) {
@@ -166,11 +245,9 @@ public:
             else {
 
                 for (int i = 0; i < vertices.size(); i++) {
-
-                    if (vertices.at(i).get_name() == fromVertex) {
+                       if (vertices.at(i).get_name() == fromVertex) {
                         Edge e(toVertex, _length, t, p);
-                        vertices.at(i).edgelist.push_back(e);
-
+                            vertices.at(i).edgelist.push_back(e);
                     }
                     /*else if (vertices.at(i).get_name() == toVertex) {
                         Edge e(toVertex, _length, t, p);
@@ -186,8 +263,24 @@ public:
         }
     }
 
+    void add_edge_between_vertices(const TVertex& from, const TVertex& to, const TEdge& e) {
+        if (!check_if_vertex_exist_by_name(from.get_name()) || !check_if_vertex_exist_by_name(to.get_name())) { 
+            cout << " Vertex " << from.get_name() << " or/and " << to.get_name() << " not exist" << endl; return;
+        }
+        if (check_if_edge_exist_between_vertices(from.get_name(), to.get_name())) {
+            cout << "Edge between " << from.get_name() << " and " << to.get_name() << " already exist" << endl; return;
+        }
+        equal compare;
+        for (size_t i = 0; i < vertices.size(); ++i) {
+            if (compare(from, vertices[i])) {
+                vertices.at(i).edgelist.push_back(e);
+                return;
+            }
+        }
+    }
 
-    void deleteEdgeByID(string fromVertex, string toVertex) {
+
+    void delete_edge_by_names_of_vertices(const string fromVertex, const string toVertex) {
         bool check = check_if_edge_exist_between_vertices(fromVertex, toVertex);
         if (check == true) {
             for (int i = 0; i < vertices.size(); i++) {
@@ -210,11 +303,11 @@ public:
                     }
                 }
             }
-            cout << "Edge Between " << fromVertex << " and " << toVertex << " Deleted Successfully." << endl;
+            cout << "Edge Between " << fromVertex << " and " << toVertex << " deleted successfully." << endl;
         }
     }
 
-    void deleteVertexByID(string vid) {
+    void delete_vertex_by_name(const string vid) {
         int vIndex = 0;
         for (int i = 0; i < vertices.size(); i++) {
             if (vertices.at(i).get_name() == vid) {
@@ -231,11 +324,11 @@ public:
 
         }
         vertices.erase(vertices.begin() + vIndex);
-        cout << "Vertex Deleted Successfully" << endl;
+        cout << "Vertex deleted successfully" << endl;
         re_count();
     }
 
-    void getAllNeigborsByID(const string vid) {
+    void get_neigbors_by_name(const string vid) {
         cout << get_vertex_by_name(vid).get_name() << " (" << get_vertex_by_name(vid).get_people_count() << ") --> ";
         for (int i = 0; i < vertices.size(); i++) {
             if (vertices.at(i).get_name() == vid) {
@@ -292,7 +385,7 @@ public:
         }
     }
 
-
+    template <typename wsm = weight_converter<TEdge>>
     vector <int> Dijkstra(int start, int finish) {
 
         vector<bool> visited; // посещенные вершины отмечаются 
@@ -348,7 +441,7 @@ public:
             visited[active.first] = true; // отмечаем вершину обработанной 
         }
         
-        cout << endl << "best length of way: " << _distance[finish].second.first << endl;
+        cout << endl << "Best length of way from " << vertices[start].get_name()<<" to " << vertices[finish].get_name()<<": " << _distance[finish].second.first << endl;
         return _distance[finish].second.second;
     }
 
@@ -363,9 +456,52 @@ public:
 
 
 
-    int main() {
-        Graph G1;
-        Vertex v0, v1, v2, v3, v4, v5;
+
+int main() {
+    //Graph<,> G1;
+    Graph<string, double> G2;
+    Graph<Vertex, Edge> G3;
+
+  /*  G3.add_vertex(Vertex("beg", 0));
+    G3.add_vertex(Vertex("A", 1));
+    G3.add_vertex(Vertex("B", 2));
+    G3.add_vertex(Vertex("C", 3));
+    G3.add_vertex(Vertex("D", 4));
+    G3.add_vertex(Vertex("fin", 5));
+        
+    G3.add_edge_between_vertices(G3.get_vertex_by_name("beg"), G3.get_vertex_by_name("A"), Edge ("A",9, true, 1));
+    G3.add_edge_between_vertices("beg", "B", 4, true, 0);
+    G3.add_edge_between_vertices("beg", "D", 5, false, 1);
+    G3.add_edge_between_vertices("beg", "fin", 8, false, 1);
+
+   
+    G3.add_edge_between_vertices("A", "B", 2, false, 0);
+    G3.add_edge_between_vertices("A", "fin",  1, true, 1);
+
+    G3.add_edge_between_vertices("B", "C", 1, true, 1);
+    G3.add_edge_between_vertices("B", "fin", 8, true, 0);
+
+    G3.add_edge_between_vertices("C", "fin", 4, false, 1);
+    G3.add_edge_between_vertices("D", "A", 1, false, 1);
+    G3.add_edge_between_vertices("D", "C", 1, false, 1);*/
+
+   G3.add_vertex(Vertex("Samara", 0));
+   G3.add_vertex(Vertex("Moscow", 1));
+   G3.add_vertex(Vertex("SaintP", 2));
+
+    G3.add_edge_between_vertices(Vertex("Samara", 0), Vertex("Moscow", 1), Edge("Moscow", 100, true, 1));
+    G3.add_edge_between_vertices(Vertex("Moscow", 1), Vertex("SaintP", 2), Edge("SaintP", 9, true, 1));
+
+    G3.print();
+    G3.BFS(0);
+    G3.Dijkstra(0, 2);
+
+
+    
+    //std::cout << G3.dfs(Vertex("Temp", 5), Vertex("Krasnoyarsk", 13));
+    //vector<int>path = G3.Dijkstra(0, 3);
+
+        /*Vertex v0, v1, v2, v3, v4, v5;
         int _population;
         double l;
         bool t = 1, p = 0;
@@ -413,12 +549,14 @@ public:
         
         G1.BFS(start);
 
+        Town beg();
 
 
         int option = 0;
         string _name, _name2;
        
-        bool check;
+        bool check;*/
+
 
         //do {
         //    cout << "What operation do you want to perform? " <<
@@ -457,7 +595,7 @@ public:
         //        cout << "Delete Vertex Operation -" << endl;
         //        cout << "Enter ID of Vertex(State) to Delete : ";
         //        cin >> _name;
-        //        G1.deleteVertexByID(_name);
+        //        G1.delete_vertex_by_name(_name);
         //
         //        break;
         //
@@ -479,7 +617,7 @@ public:
         //        cin >> _name;
         //        cout << "Enter ID of Destination Vertex(State): ";
         //        cin >> _name2;
-        //        G1.deleteEdgeByID(_name, _name2);
+        //        G1.delete_edge_by_names_of_vertices(_name, _name2);
         //
         //        break;
         //
@@ -503,7 +641,7 @@ public:
         //        cout << "Print All Neigbors of a Vertex -" << endl;
         //        cout << "Enter ID of Vertex(State) to fetch all Neigbors : ";
         //        cin >> _name;
-        //        G1.getAllNeigborsByID(_name);
+        //        G1.get_neigbors_by_name(_name);
         //
         //        break;
         //
@@ -522,3 +660,6 @@ public:
 
         return 0;
     }
+    
+
+   

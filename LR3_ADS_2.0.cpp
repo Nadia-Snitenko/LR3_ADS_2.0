@@ -5,7 +5,6 @@
 #include <iterator>
 #include <queue>
 
-
 using namespace std;
 
 class Town {
@@ -282,7 +281,7 @@ public:
 
     void delete_edge_by_names_of_vertices(const string fromVertex, const string toVertex) {
         bool check = check_if_edge_exist_between_vertices(fromVertex, toVertex);
-        if (check == true) {
+        if (check) {
             for (int i = 0; i < vertices.size(); i++) {
                 if (vertices.at(i).get_name() == fromVertex) {
                     for (auto it = vertices.at(i).edgelist.begin(); it != vertices.at(i).edgelist.end(); it++) {
@@ -458,18 +457,16 @@ public:
 
 
 int main() {
-    //Graph<,> G1;
-    Graph<string, double> G2;
     Graph<Vertex, Edge> G3;
 
-  /*  G3.add_vertex(Vertex("beg", 0));
+    /*G3.add_vertex(Vertex("beg", 0));
     G3.add_vertex(Vertex("A", 1));
     G3.add_vertex(Vertex("B", 2));
     G3.add_vertex(Vertex("C", 3));
     G3.add_vertex(Vertex("D", 4));
     G3.add_vertex(Vertex("fin", 5));
         
-    G3.add_edge_between_vertices(G3.get_vertex_by_name("beg"), G3.get_vertex_by_name("A"), Edge ("A",9, true, 1));
+    G3.add_edge_between_vertices(Vertex"beg"), G3.get_vertex_by_name("A"), Edge ("A",9, true, 1));
     G3.add_edge_between_vertices("beg", "B", 4, true, 0);
     G3.add_edge_between_vertices("beg", "D", 5, false, 1);
     G3.add_edge_between_vertices("beg", "fin", 8, false, 1);
@@ -485,20 +482,36 @@ int main() {
     G3.add_edge_between_vertices("D", "A", 1, false, 1);
     G3.add_edge_between_vertices("D", "C", 1, false, 1);*/
 
-   G3.add_vertex(Vertex("Samara", 0));
-   G3.add_vertex(Vertex("Moscow", 1));
-   G3.add_vertex(Vertex("SaintP", 2));
 
-    G3.add_edge_between_vertices(Vertex("Samara", 0), Vertex("Moscow", 1), Edge("Moscow", 100, true, 1));
-    G3.add_edge_between_vertices(Vertex("Moscow", 1), Vertex("SaintP", 2), Edge("SaintP", 9, true, 1));
+
+   G3.add_vertex(Vertex("Samara", 1136709));
+   G3.add_vertex(Vertex("Moscow", 12635466));
+   G3.add_vertex(Vertex("SaintP", 15377503));
+   G3.add_vertex(Vertex("Novosibirsk", 1621330));
+   G3.add_vertex(Vertex("Yekaterinburg", 1495066));
+   G3.add_vertex(Vertex("Kazan", 1259173));
+
+    G3.add_edge_between_vertices(Vertex("Samara", 1136709), Vertex("Moscow", 12635466), Edge("Moscow", 853, true, 1));
+    //G3.add_edge_between_vertices(Vertex("Samara", 1136709), Vertex("SaintP", 15377503), Edge("SaintP", 1417, true, 0));
+    G3.add_edge_between_vertices(Vertex("Samara", 1136709), Vertex("Kazan", 1259173), Edge("Kazan", 296, true, 0));
+    G3.add_edge_between_vertices(Vertex("Samara", 1136709), Vertex("Kazan", 1259173), Edge("Kazan", 296, true, 1));
+
+    G3.add_edge_between_vertices(Vertex("Moscow", 12635466), Vertex("SaintP", 15377503), Edge("SaintP", 634, true, 0));
+    G3.add_edge_between_vertices(Vertex("Moscow", 12635466), Vertex("Novosibirsk", 1621330), Edge("Novosibirsk", 2811, true, 1));
+
+    G3.add_edge_between_vertices(Vertex("SaintP", 15377503), Vertex("Moscow", 12635466), Edge("Moscow", 2811, true, 1));
+
+    G3.add_edge_between_vertices(Vertex("Novosibirsk", 1621330), Vertex("SaintP", 15377503), Edge("SaintP", 3105, true, 0));
+    G3.add_edge_between_vertices(Vertex("Yekaterinburg", 1495066), Vertex("Moscow", 12635466), Edge("Moscow", 743, true, 1));
+    G3.add_edge_between_vertices(Vertex("Kazan", 1259173), Vertex("Moscow", 12635466), Edge("Moscow", 718, true, 1));
+    G3.add_edge_between_vertices(Vertex("Kazan", 1259173), Vertex("Yekaterinburg", 1495066), Edge("Yekaterinburg", 718, true, 1));
+
 
     G3.print();
-    G3.BFS(0);
+    G3.BFS(5);
     G3.Dijkstra(0, 2);
 
 
-    
-    //std::cout << G3.dfs(Vertex("Temp", 5), Vertex("Krasnoyarsk", 13));
     //vector<int>path = G3.Dijkstra(0, 3);
 
         /*Vertex v0, v1, v2, v3, v4, v5;
